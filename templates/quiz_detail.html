@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+
+{% block title %}{{ quiz.title }}{% endblock %}
+
+{% block content %}
+<div class="quiz-wrapper">
+
+    <div class="quiz-card">
+        <h2>AI Generated Quiz</h2>
+
+        <form method="POST">
+            {% csrf_token %}
+
+            <!-- User Name -->
+            <div class="user-info">
+                <label>Your Name</label>
+                <input type="text" name="user_name" placeholder="Enter your name" required>
+            </div>
+
+            <!-- Questions -->
+            {% for q in quiz.questions %}
+            <div class="question">
+                <b>Q{{ forloop.counter }}. {{ q.question }}</b>
+
+                <div class="options-grid">
+                    {% for opt in q.options %}
+                    <label class="option-label">
+                        <input type="radio" name="q{{ forloop.parentloop.counter0 }}" value="{{ opt }}" required>
+                        {{ opt }}
+                    </label>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+
+            <button type="submit" class="submit-btn">Submit Quiz</button>
+        </form>
+    </div>
+</div>
+
+<style>
+/* Wrapper */
+.quiz-wrapper {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    background: #edf2f7; /* light subtle background */
+    padding: 40px 10px;
+    font-family: 'Arial', sans-serif;
+}
+
+/* Card */
+.quiz-card {
+    background: #ffffff;
+    padding: 30px 25px;
+    border-radius: 20px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    max-width: 100%;
+    width: 100%;
+    border-left: 5px solid #3b82f6;
+}
+
+/* Heading */
+.quiz-card h2 {
+    text-align: center;
+    font-size: 2rem;
+    color: #1e3a8a;
+    margin-bottom: 30px;
+    letter-spacing: 1px;
+}
+
+/* User Input */
+.user-info {
+    margin-bottom: 25px;
+}
+.user-info label {
+    display: block;
+    font-weight: 600;
+    color: #1e40af;
+    margin-bottom: 8px;
+}
+.user-info input {
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid #cbd5e1;
+    font-size: 16px;
+    background-color: #f8fafc;
+}
+.user-info input:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 8px rgba(59,130,246,0.3);
+}
+
+/* Questions */
+.question {
+    margin-bottom: 20px;
+    width: 100%;
+}
+.question b {
+    display: block;
+    margin-bottom: 12px;
+    font-size: 1.1rem;
+    color: #1e293b;
+}
+
+/* Options Grid - 2 columns full width */
+.options-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    width: 100%;
+}
+
+/* Option styling */
+.option-label {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid #cbd5e1;
+    background-color: #f1f5f9;
+    cursor: pointer;
+    font-size: 15px;
+    color: #1e293b;
+    transition: all 0.2s ease;
+}
+.option-label input[type="radio"] {
+    margin-right: 10px;
+    accent-color: #3b82f6;
+}
+.option-label:hover {
+    background-color: #e0f2fe;
+    border-color: #3b82f6;
+}
+
+/* Submit Button */
+.submit-btn {
+    display: block;
+    width: 100%;
+    padding: 14px;
+    font-size: 17px;
+    font-weight: bold;
+    border: none;
+    border-radius: 12px;
+    background: linear-gradient(90deg, #3b82f6, #60a5fa);
+    color: #fff;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 20px;
+}
+.submit-btn:hover {
+    transform: scale(1.02);
+    box-shadow: 0 4px 15px rgba(59,130,246,0.4);
+}
+
+/* Responsive */
+@media(max-width: 600px){
+    .quiz-card {
+        padding: 20px 15px;
+    }
+    .quiz-card h2 {
+        font-size: 1.5rem;
+    }
+    .options-grid {
+        grid-template-columns: 1fr; /* single column on mobile */
+    }
+    .submit-btn {
+        font-size: 16px;
+        padding: 12px;
+    }
+}
+</style>
+{% endblock %}
