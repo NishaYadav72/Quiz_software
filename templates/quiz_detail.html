@@ -33,8 +33,17 @@
             </div>
             {% endfor %}
 
-            <button type="submit" class="submit-btn">Submit Quiz</button>
+            <!-- BUTTONS IN SAME ROW -->
+            <div class="btn-row">
+                <button type="submit" class="submit-btn">Submit Quiz</button>
+
+                <a href="{% url 'download_quiz_details_pdf' %}" class="download-pdf-btn">
+                    Download PDF
+                </a>
+            </div>
+
         </form>
+
     </div>
 </div>
 
@@ -45,7 +54,7 @@
     display: flex;
     justify-content: center;
     align-items: flex-start;
-    background: #edf2f7; /* light subtle background */
+    background: #edf2f7;
     padding: 40px 10px;
     font-family: 'Arial', sans-serif;
 }
@@ -67,7 +76,6 @@
     font-size: 2rem;
     color: #1e3a8a;
     margin-bottom: 30px;
-    letter-spacing: 1px;
 }
 
 /* User Input */
@@ -97,7 +105,6 @@
 /* Questions */
 .question {
     margin-bottom: 20px;
-    width: 100%;
 }
 .question b {
     display: block;
@@ -106,12 +113,11 @@
     color: #1e293b;
 }
 
-/* Options Grid - 2 columns full width */
+/* Options grid */
 .options-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 8px;
-    width: 100%;
 }
 
 /* Option styling */
@@ -126,7 +132,7 @@
     cursor: pointer;
     font-size: 15px;
     color: #1e293b;
-    transition: all 0.2s ease;
+    transition: 0.2s;
 }
 .option-label input[type="radio"] {
     margin-right: 10px;
@@ -137,11 +143,17 @@
     border-color: #3b82f6;
 }
 
+/* BUTTON ROW */
+.btn-row {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 30px;
+}
+
 /* Submit Button */
 .submit-btn {
-    display: block;
-    width: 100%;
-    padding: 14px;
+    padding: 14px 25px;
     font-size: 17px;
     font-weight: bold;
     border: none;
@@ -149,29 +161,47 @@
     background: linear-gradient(90deg, #3b82f6, #60a5fa);
     color: #fff;
     cursor: pointer;
-    transition: all 0.3s ease;
-    margin-top: 20px;
+    transition: 0.3s;
 }
 .submit-btn:hover {
-    transform: scale(1.02);
+    transform: scale(1.05);
     box-shadow: 0 4px 15px rgba(59,130,246,0.4);
+}
+
+/* PDF Button */
+.download-pdf-btn {
+    padding: 14px 25px;
+    font-size: 16px;
+    font-weight: 600;
+    background: linear-gradient(90deg, #0ea5e9, #3b82f6);
+    color: #fff;
+    border-radius: 12px;
+    text-decoration: none;
+    transition: 0.3s;
+    box-shadow: 0 4px 15px rgba(59,130,246,0.4);
+}
+
+.download-pdf-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 20px rgba(14,165,233,0.5);
+    background: linear-gradient(90deg, #38bdf8, #60a5fa);
 }
 
 /* Responsive */
 @media(max-width: 600px){
-    .quiz-card {
-        padding: 20px 15px;
+    .btn-row {
+        flex-direction: column;
+        width: 100%;
     }
-    .quiz-card h2 {
-        font-size: 1.5rem;
+    .btn-row a,
+    .btn-row button {
+        width: 100%;
+        text-align: center;
     }
     .options-grid {
-        grid-template-columns: 1fr; /* single column on mobile */
-    }
-    .submit-btn {
-        font-size: 16px;
-        padding: 12px;
+        grid-template-columns: 1fr;
     }
 }
 </style>
+
 {% endblock %}

@@ -64,25 +64,47 @@
         color: #111827;
     }
 
-    .btn-home {
-        display: block;
-        width: 200px;
-        margin: 35px auto 0 auto;
-        text-align: center;
-        padding: 12px 25px;
-        background: linear-gradient(90deg, #3b82f6, #06b6d4);
-        color: #ffffff;
-        font-size: 16px;
+    /* BUTTON ROW */
+    .btn-row {
+        margin-top: 35px;
+        display: flex;
+        justify-content: center;
+        gap: 25px;
+    }
+
+    /* PDF Button */
+    .btn-download {
+        padding: 14px 25px;
+        font-size: 17px;
         font-weight: bold;
-        border: none;
+        background: linear-gradient(90deg, #0ea5e9, #3b82f6);
+        color: #fff;
         border-radius: 12px;
         text-decoration: none;
-        transition: all 0.3s ease;
+        transition: 0.3s;
+        box-shadow: 0 4px 15px rgba(59,130,246,0.4);
+    }
+    .btn-download:hover {
+        transform: scale(1.05);
+        box-shadow: 0 6px 20px rgba(14,165,233,0.5);
+    }
+
+    /* HOME Button */
+    .btn-home {
+        padding: 14px 25px;
+        font-size: 17px;
+        font-weight: bold;
+        background: linear-gradient(90deg, #3b82f6, #06b6d4);
+        color: #ffffff;
+        border-radius: 12px;
+        text-decoration: none;
+        transition: 0.3s;
+        box-shadow: 0 4px 15px rgba(59,130,246,0.4);
     }
 
     .btn-home:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        transform: scale(1.05);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
     }
 
     h2 {
@@ -91,6 +113,17 @@
         margin-bottom: 20px;
         border-bottom: 2px solid #e5e7eb;
         padding-bottom: 8px;
+    }
+
+    @media(max-width:600px){
+        .btn-row{
+            flex-direction: column;
+            gap: 15px;
+        }
+        .btn-row a{
+            width: 100%;
+            text-align: center;
+        }
     }
 </style>
 
@@ -120,6 +153,11 @@
     </div>
     {% endfor %}
 
-    <a href="{% url 'home' %}" class="btn-home">Go to Home</a>
+    <!-- Button Row -->
+    <div class="btn-row">
+        <a href="{% url 'download_quiz_pdf' %}" class="btn-download">Download PDF</a>
+        <a href="{% url 'home' %}" class="btn-home">Go to Home</a>
+    </div>
+
 </div>
 {% endblock %}
