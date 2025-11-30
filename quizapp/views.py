@@ -3,6 +3,9 @@ from .forms import UploadFileForm
 from .models import Quiz, QuizResult
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.contrib.auth.models import User
+from django.http import HttpResponse
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import letter
 from .ai_utils import (
     extract_text_from_pdf,
     extract_text_from_image,
@@ -63,11 +66,15 @@ def upload_file(request):
 def quiz_detail(request, quiz_id):
     quiz = Quiz.objects.get(id=quiz_id)
 
+    # ⭐ STORE QUIZ IN SESSION (for PDF download)
+    request.session["quiz_data"] = quiz.questions
+    request.session["quiz_title"] = quiz.title
+
     if request.method == "POST":
         user_name = request.POST.get('user_name', '').strip()
         total = len(quiz.questions)
         score = 0
-        details = []   # <-- yaha store karenge har question ka result
+        details = []
 
         for i, q in enumerate(quiz.questions):
             user_ans = request.POST.get(f"q{i}", "").strip()
@@ -85,6 +92,12 @@ def quiz_detail(request, quiz_id):
                 "is_correct": is_correct,
                 "explanation": q.get("explanation", "No explanation")
             })
+
+        # ⭐ STORE RESULT IN SESSION (for PDF)
+        request.session["result_details"] = details
+        request.session["score"] = score
+        request.session["total"] = total
+        request.session["user_name"] = user_name
 
         QuizResult.objects.create(
             quiz=quiz,
@@ -135,3 +148,90 @@ def user_register(request):
 def user_logout(request):
     auth_logout(request)
     return redirect("home")
+
+def download_quiz_details_pdf(request):
+    quiz_data = request.session.get("quiz_data")
+
+    if not quiz_data:
+        return HttpResponse("No quiz data found.")
+
+    from reportlab.pdfgen import canvas
+    from reportlab.lib.pagesizes import A4
+
+    response = HttpResponse(content_type="application/pdf")
+    response['Content-Disposition'] = 'attachment; filename="quiz.pdf"'
+
+    p = canvas.Canvas(response, pagesize=A4)
+    width, height = A4
+    y = height - 50
+
+    p.setFont("Helvetica-Bold", 16)
+    p.drawString(50, y, "Quiz Questions")
+    y -= 40
+
+    for i, q in enumerate(quiz_data, start=1):
+        p.setFont("Helvetica-Bold", 12)
+        p.drawString(50, y, f"Q{i}. {q['question']}")
+        y -= 20
+
+        p.setFont("Helvetica", 11)
+        for opt in q["options"]:
+            p.drawString(70, y, f"- {opt}")
+            y -= 15
+
+        y -= 10
+
+        if y < 80:
+            p.showPage()
+            y = height - 50
+
+    p.save()
+    return response
+
+
+def download_quiz_pdf(request):
+    from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
+    from reportlab.lib.styles import getSampleStyleSheet
+    from django.http import HttpResponse
+
+    quiz_title = request.session.get("quiz_title")
+    quiz_data = request.session.get("quiz_data")
+    result_details = request.session.get("result_details")
+    user_name = request.session.get("user_name")
+    score = request.session.get("score")
+    total = request.session.get("total")
+
+    if not quiz_data:
+        return HttpResponse("No quiz data found in session.")
+
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="quiz_result.pdf"'
+
+    doc = SimpleDocTemplate(response)
+    styles = getSampleStyleSheet()
+    story = []
+
+    # Title
+    story.append(Paragraph(f"<b>{quiz_title}</b>", styles["Title"]))
+    story.append(Spacer(1, 20))
+
+    # User and Score
+    story.append(Paragraph(f"Name: {user_name}", styles["Normal"]))
+    story.append(Paragraph(f"Score: {score} / {total}", styles["Normal"]))
+    story.append(Spacer(1, 20))
+
+    # Loop through QUESTION + RESULT
+    for q in result_details:
+        story.append(Paragraph(f"<b>Q: {q['question']}</b>", styles["Heading4"]))
+
+        # Options
+        for opt in q["options"]:
+            story.append(Paragraph(f"• {opt}", styles["Normal"]))
+
+        story.append(Paragraph(f"<b>Your Answer:</b> {q['user_answer']}", styles["Normal"]))
+        story.append(Paragraph(f"<b>Correct Answer:</b> {q['correct_answer']}", styles["Normal"]))
+        story.append(Paragraph(f"<b>Explanation:</b> {q['explanation']}", styles["Normal"]))
+        story.append(Spacer(1, 15))
+
+    doc.build(story)
+    return response
