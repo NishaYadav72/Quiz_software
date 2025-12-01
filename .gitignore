@@ -1,1 +1,6 @@
-venv/ 
+echo media/uploads/ > .gitignore
+echo *.pdf >> .gitignore
+echo *.jpg >> .gitignore
+echo *.jpeg >> .gitignore
+echo *.png >> .gitignore
+echo *.zip >> .gitignore
